@@ -1,0 +1,87 @@
+name: CI Pipeline - Development Workflow
+on:
+  #Trigger the workflow on push to the feature branch
+  push:
+    branches:
+      - 'feature-*'
+
+env:
+  WF_MESSAGE: ${{ github.event.head_commit.message }}  #get message from commit
+  
+jobs:
+  # Jobs are controlled by the commit message flags in [...], they are:
+  # skip-actions  : run no jobs
+  # all-jobs  : run all jobs
+  # sca-only  : run SonarQube only
+  # scan-only : run SAST scans only
+  # test-only : run unit tests
+  # build-only : build binary / image
+  # deploy    : deploy application locally (stand alone jave, docker, or kubernetes)
+
+  log-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log ENV Variables
+        run: |
+          echo "WF_MESSAGE: ${WF_MESSAGE}"
+
+  # dump-github-context:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Dump CitHub Context
+  #       env:
+  #         GITHUB_CONTEXT: ${{ toJson(github) }}
+  #       run: |
+  #         echo "$GITHUB_CONTEXT"
+
+  # dump-job-context:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Dump Job Context
+  #       env:
+  #         JOB_CONTEXT: ${{ toJson(job) }}
+  #       run: echo "$JOB_CONTEXT"
+
+  call-sonar-workflow:
+    if: "contains(github.event.head_commit.message, 'sca-only') || contains(github.event.head_commit.message, 'all-jobs')" 
+    needs: log-env
+    # runs-on: ubuntu-latest
+    # steps:
+    #   - run: echo 'Running sca-only'
+    uses: BLOCK-AID/github-actions-template/.github/workflows/sonar.yml@feature-1
+    secrets:
+      host: ${{ secrets.SONARQUBE_HOST }}
+      login: ${{ secrets.SONARQUBE_TOKEN }}
+
+  call-scan-workflow:
+    if: "contains(github.event.head_commit.message, 'sast-only') || contains(github.event.head_commit.message, 'all-jobs')" 
+    needs: log-env
+    # runs-on: ubuntu-latest
+    # steps:
+    #   - run: echo 'Running sast-only'
+    uses: BLOCK-AID/github-actions-template/.github/workflows/trivy.yml@feature-1
+
+  call-test-workflow:
+    if: "contains(github.event.head_commit.message, 'test-only') || contains(github.event.head_commit.message, 'all-jobs')" 
+    needs: log-env
+    # runs-on: ubuntu-latest
+    # steps:
+    #   - run: echo 'Running test-only'
+    uses: BLOCK-AID/github-actions-template/.github/workflows/test.yml@feature-1
+
+  call-build-workflow:
+    if: "contains(github.event.head_commit.message, 'build-only') || contains(github.event.head_commit.message, 'all-jobs')" 
+    needs: [call-sonar-workflow, call-scan-workflow, call-test-workflow]
+    # runs-on: ubuntu-latest
+    # steps:
+    #   - run: echo 'Running build-only'
+    uses: BLOCK-AID/github-actions-template/.github/workflows/build.yml@feature-1
+
+  call-deploy-workflow:
+    if: "contains(github.event.head_commit.message, 'deploy') || contains(github.event.head_commit.message, 'all-jobs')" 
+    needs: call-build-workflow
+    # runs-on: ubuntu-latest
+    # steps:
+    #   - run: echo 'Running local deploy'
+    uses: BLOCK-AID/github-actions-template/.github/workflows/deploy.yml@feature-1
+

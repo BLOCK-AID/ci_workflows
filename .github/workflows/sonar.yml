@@ -1,0 +1,30 @@
+on:
+  workflow_call:
+    secrets:
+      host:
+        required: true
+      login:
+        required: true
+jobs:
+  #Sonar's Job
+  sonar:
+    #Depends on test's job
+    # needs: tests
+    # if: ${{ contains(github.event.*.labels.*.name, 'sca-only') }}
+    name: SonarQube analysis
+    runs-on: ubuntu-latest
+    steps:
+      #Set up Maven cache
+      - name: Cache Maven packages
+        #This action allows caching dependencies and build outputs to improve workflow execution time.
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      # Setup SonarQube server and run scan
+      - name: SonarQube Scan
+        uses: kitabisa/sonarqube-action@v1.1.0
+        with:
+          host: ${{ secrets.host }}
+          login: ${{ secrets.login }}
