@@ -6,7 +6,7 @@ on:
       login:
         required: true
 jobs:
-  #Sonar's Job
+  # SCA Job
   sonar:
     #Depends on test's job
     # needs: tests

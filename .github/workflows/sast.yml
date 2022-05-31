@@ -2,7 +2,7 @@ on:
   workflow_call:
 
 jobs:
-  #Trivy's Job
+  # SAST Job
   trivy:
     name: Trivy Check
     runs-on: ubuntu-18.04
