@@ -96,7 +96,7 @@ job:
         run: |
           echo "WF_MESSAGE: ${WF_MESSAGE}"
           
-  call-sonar-workflow:
+  call-sca-workflow:
     if: "contains(github.event.head_commit.message, 'sca-only') || contains(github.event.head_commit.message, 'all-jobs')" 
     needs: log-env
     uses: BLOCK-AID/ci_workflows/.github/workflows/sonar.yml@master
@@ -104,7 +104,7 @@ job:
       host: ${{ secrets.SONARQUBE_HOST }}
       login: ${{ secrets.SONARQUBE_TOKEN }}
 
-  call-scan-workflow:
+  call-sast-workflow:
     if: "contains(github.event.head_commit.message, 'sast-only') || contains(github.event.head_commit.message, 'all-jobs')" 
     needs: log-env
     uses: BLOCK-AID/ci_workflows/.github/workflows/trivy.yml@master
@@ -116,6 +116,6 @@ job:
 ```
 In this example, only the following jobs will be executed:
 
-+ call-sonar-workflow
-+ call-scan-workflow
++ call-sca-workflow
++ call-sast-workflow
 
