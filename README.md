@@ -81,7 +81,7 @@ For this pipeline, the jobs are controlled by two factors: the branch and keywor
 + merge : raise Pull Request to merge feature to develop branch
 + raise-pr : raise Pull Request to move feature to develop branch  
 
-These filters are set in the commit message such as when pushing new code:
+For example, if we set the labels in the PR as "sca-only" & "sast-only" before pushing new code:
 ```
 name: CI Pipeline - Feature Branch Workflow
 on:
