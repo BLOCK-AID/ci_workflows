@@ -69,7 +69,7 @@ Workflow triggers are events that cause a workflow to run.  These events can be:
 + Scheduled times
 + Manual
 
-For this pipeline, the jobs are controlled by two factors: the branch and keywords in the commit message that is used as a filter to whether or not execute specific jobs.  The keywords controlling the execution of the jobs within a starter workflows are:
+For this pipeline, the jobs are controlled by two factors: the branch and keywords in the PR labels that are used as filters to whether or not execute specific jobs or merge the code.  The keywords controlling the execution of the jobs within a starter workflows are:
 
 + skip-actions : run no jobs
 + all-jobs : run all jobs
